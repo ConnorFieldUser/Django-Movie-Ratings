@@ -33,7 +33,6 @@ def add_my_files(apps, schema_editor):
         reader = csv.DictReader(infile, delimiter='|', fieldnames=["id", "age", "gender", "occupation",
                                 "zip_code"])
         for row in reader:
-            print(row)
             Rater.objects.create(age=row["age"], gender=row["gender"],
                                  occupation=row["occupation"], zip_code=["zip_code"])
 
