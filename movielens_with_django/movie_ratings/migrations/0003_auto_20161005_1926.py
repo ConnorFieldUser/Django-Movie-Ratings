@@ -8,18 +8,18 @@ import csv
 
 
 def add_my_files(apps, schema_editor):
-    Item = apps.get_model("movielens_with_django", "Item")
-    Rater = apps.get_model("movielens_with_django", "Rater")
-    Data = apps.get_model("movielens_with_django", "Data")
+    Item = apps.get_model("movie_ratings", "Item")
+    Rater = apps.get_model("movie_ratings", "Rater")
+    Data = apps.get_model("movie_ratings", "Data")
     with open('item.csv', encoding='latin1') as infile:
-        reader = csv.DictReader(infile, delimiter='|', fieldnames=["movie_id", "title", "release_date", "vid_releasr",
+        reader = csv.DictReader(infile, delimiter='|', fieldnames=["id", "title", "release_date", "vid_releasr",
                                 "IMDb_url", "unknown", "action", "adventure", "animation", "childrens",
                                                                    "comedy", "crime", "documentary", "drama",
                                                                    "fantasy", "film_noir", "horror", "musical",
                                                                    "mystery", "romance",
                                                                    "sci_fi", "thriller", "war", "western"])
         for row in reader:
-            Item.objects.create(movie_id=row["movie_id"], title=row["title"],
+            Item.objects.create(title=row["title"],
                                 release_date=row["release_date"], vid_releasr=row["vid_releasr"],
                                 IMDb_url=row["IMDb_url"], unknown=row["unknown"], action=row["action"],
                                 adventure=row["adventure"], animation=row["animation"],
@@ -30,19 +30,20 @@ def add_my_files(apps, schema_editor):
                                 thriller=row["thriller"], war=row["war"], western=row["western"])
 
     with open('rater.csv') as infile:
-        reader = csv.DictReader(infile, delimiter='|', fieldnames=["user_id", "age", "gender", "occupation",
+        reader = csv.DictReader(infile, delimiter='|', fieldnames=["id", "age", "gender", "occupation",
                                 "zip_code"])
         for row in reader:
-            Rater.objects.create(user_id=row["user_id"], age=row["age"], gender=row["gender"],
+            print(row)
+            Rater.objects.create(age=row["age"], gender=row["gender"],
                                  occupation=row["occupation"], zip_code=["zip_code"])
 
     with open('data.csv', encoding='latin1') as infile:
-        reader = csv.DictReader(infile, delimiter='\t', fieldnames=["user_id", "movie_id", "rating", "timestamp"])
+        reader = csv.DictReader(infile, delimiter='\t', fieldnames=["rater_id", "item_id", "rating", "timestamp"])
         for row in reader:
-            Data.objects.create(user_id=row["user_id"], movie_id=row["movie_id"], rating=row["rating"],
+            rater_id = Rater.objects.get(id=row["rater_id"])
+            item_id = Item.objects.get(id=row["item_id"])
+            Data.objects.create(rater_id=rater_id, item_id=item_id, rating=row["rating"],
                                 timestamp=row["timestamp"])
-
-    raise Exception("error dude")
 
 
 class Migration(migrations.Migration):
